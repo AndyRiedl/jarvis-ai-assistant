@@ -1,5 +1,4 @@
 # Multi-stage build optimized for M3 Pro Mac (ARM64)
-# Using slim image without build tools to avoid compilation issues
 
 FROM python:3.11-slim-bookworm AS base
 
@@ -35,14 +34,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Upgrade pip, setuptools, wheel
-RUN pip install --upgrade pip setuptools wheel
-
 # Copy requirements
 COPY requirements.txt .
 
-# Install requirements with verbose output for debugging
-RUN pip install --no-cache-dir -r requirements.txt 2>&1
+# Install requirements ONLY (no pip upgrade)
+RUN pip install --no-cache-dir -r requirements.txt
 
 # ==========================================
 # Runtime Stage
