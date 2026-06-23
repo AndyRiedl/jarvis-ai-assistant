@@ -1,7 +1,29 @@
 # Multi-stage build optimized for M3 Pro Mac (ARM64)
-FROM python:3.11-slim-bookworm AS builder
+# Using slim image without build tools to avoid compilation issues
+
+FROM python:3.11-slim-bookworm AS base
 
 WORKDIR /app
+
+# Install system dependencies (minimal set)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Python environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Create non-root user
+RUN useradd -m -u 1000 jarvis
+
+# ==========================================
+# Builder Stage
+# ==========================================
+FROM base AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -13,38 +35,32 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy and install requirements
+# Upgrade pip, setuptools, wheel
+RUN pip install --upgrade pip setuptools wheel
+
+# Copy requirements
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r requirements.txt
+
+# Install requirements with verbose output for debugging
+RUN pip install --no-cache-dir -r requirements.txt 2>&1
 
 # ==========================================
 # Runtime Stage
 # ==========================================
-FROM python:3.11-slim-bookworm
-
-WORKDIR /app
-
-# Install runtime dependencies only
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+FROM base AS runtime
 
 # Copy virtual environment from builder
 COPY --from=builder /opt/venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH" \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Create app directory structure
-RUN mkdir -p /app/logs /app/data /app/cache
+# Create app directories
+RUN mkdir -p /app/logs /app/data /app/cache && \
+    chown -R jarvis:jarvis /app
 
-# Copy application
-COPY . .
+# Copy application code
+COPY --chown=jarvis:jarvis . .
 
-# Create non-root user for security
-RUN useradd -m -u 1000 jarvis && chown -R jarvis:jarvis /app
+# Switch to non-root user
 USER jarvis
 
 # Health check
