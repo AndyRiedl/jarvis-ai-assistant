@@ -5,6 +5,7 @@ Supports fetching posts, creating media containers, publishing, and AI caption g
 """
 
 import logging
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 import httpx
@@ -15,6 +16,22 @@ from app.core.ollama_client import generate_text
 logger = logging.getLogger(__name__)
 
 GRAPH_BASE = f"https://graph.facebook.com/{settings.INSTAGRAM_GRAPH_API_VERSION}"
+
+
+class MediaType(str, Enum):
+    IMAGE = "image"
+    VIDEO = "video"
+    CAROUSEL = "carousel"
+    REEL = "reel"
+
+
+def _parse_media_type(raw: str) -> str:
+    """Normalise Instagram API media type strings to lowercase enum values"""
+    normalised = raw.lower().replace("carousel_album", "carousel").replace("reels", "reel")
+    try:
+        return MediaType(normalised).value
+    except ValueError:
+        return normalised
 
 
 class InstagramService:
@@ -66,7 +83,7 @@ class InstagramService:
             posts.append({
                 "id": item.get("id"),
                 "caption": item.get("caption", ""),
-                "media_type": item.get("media_type", "IMAGE").lower(),
+                "media_type": _parse_media_type(item.get("media_type", "IMAGE")),
                 "image_url": item.get("media_url") or item.get("thumbnail_url"),
                 "published_at": item.get("timestamp"),
                 "permalink": item.get("permalink"),

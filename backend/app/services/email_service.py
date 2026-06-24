@@ -209,6 +209,7 @@ class EmailService:
             hostname=self.smtp_host,
             port=self.smtp_port,
             username=self.email_address,
+            use_tls=False,
             start_tls=True,
         )
         smtp_kwargs["password"] = self.app_password

@@ -115,6 +115,7 @@ async def chat_stream(
         "options": {
             "temperature": settings.LLM_TEMPERATURE,
             "num_predict": settings.LLM_MAX_TOKENS,
+            "num_ctx": settings.LLM_CONTEXT_WINDOW,
         },
         "stream": True,
     }

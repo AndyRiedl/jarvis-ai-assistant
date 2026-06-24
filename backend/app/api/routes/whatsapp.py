@@ -79,4 +79,4 @@ async def receive_webhook(payload: dict):
     except Exception as e:
         logger.error(f"WhatsApp webhook processing failed: {e}")
         # Always return 200 to Meta to prevent retries
-        return {"status": "error", "detail": str(e)}
+        return {"status": "error", "detail": "Webhook processing failed"}
