@@ -74,10 +74,7 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
-    entrypoint: /bin/sh
-    command:
-      - -c
-      - "ollama serve & sleep 5 && ollama pull mistral:latest && wait"
+    command: ["ollama", "serve"]
 
   # ==========================================
   # FastAPI Backend
