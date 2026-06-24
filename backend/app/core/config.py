@@ -128,7 +128,7 @@ class Settings(BaseSettings):
     # ==========================================
     # Security
     # ==========================================
-    ALLOWED_IPS: str = Field(default="127.0.0.1,localhost", env="ALLOWED_IPS")
+    ALLOWED_IPS: List[str] = Field(default=["127.0.0.1", "localhost"], env="ALLOWED_IPS")
     RATE_LIMIT_REQUESTS: int = Field(default=100, env="RATE_LIMIT_REQUESTS")
     RATE_LIMIT_WINDOW: int = Field(default=3600, env="RATE_LIMIT_WINDOW")
     ENABLE_API_DOCS: bool = Field(default=True, env="ENABLE_API_DOCS")
@@ -156,7 +156,7 @@ class Settings(BaseSettings):
 
     @validator("ALLOWED_IPS", pre=True)
     def parse_allowed_ips(cls, v):
-        """Parse allowed IPs from string"""
+        """Parse allowed IPs from string or list"""
         if isinstance(v, str):
             return [ip.strip() for ip in v.split(",")]
         return v
