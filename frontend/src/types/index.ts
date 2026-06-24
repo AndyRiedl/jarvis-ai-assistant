@@ -119,6 +119,17 @@ export interface JarvisHubState {
 }
 
 // ==========================================
+// Chat / Voice Types
+// ==========================================
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+// ==========================================
 // API Response Types
 // ==========================================
 
