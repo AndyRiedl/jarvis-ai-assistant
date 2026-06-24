@@ -11,12 +11,10 @@ services:
       POSTGRES_USER: jarvis
       POSTGRES_PASSWORD: jarvis_password
       POSTGRES_DB: jarvis
-      POSTGRES_INITDB_ARGS: "-c max_connections=100 -c shared_buffers=256MB"
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./infrastructure/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - jarvis-network
     healthcheck:
@@ -64,10 +62,8 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
-      - ./infrastructure/ollama:/etc/ollama
     networks:
       - jarvis-network
-    # For M3 Pro Mac optimization
     deploy:
       resources:
         limits:
@@ -80,7 +76,6 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
-    # Pull Mistral model on startup
     command: sh -c 'ollama serve & sleep 5 && ollama pull mistral:latest && wait'
 
   # ==========================================
@@ -89,9 +84,7 @@ services:
   api:
     build:
       context: ./backend
-      dockerfile: Dockerfile.m3
-      args:
-        BUILDKIT_INLINE_CACHE: 1
+      dockerfile: Dockerfile
     container_name: jarvis-api
     environment:
       - DATABASE_URL=postgresql://jarvis:jarvis_password@db:5432/jarvis
@@ -116,8 +109,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     command: >
-      sh -c 'python -m alembic upgrade head &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'
+      sh -c 'uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'
 
   # ==========================================
   # Nginx Reverse Proxy
