@@ -68,11 +68,6 @@ services:
           memory: 12G
         reservations:
           memory: 8G
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     restart: unless-stopped
     command: ["ollama", "serve"]
 
@@ -102,8 +97,6 @@ services:
       db:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      ollama:
         condition: service_healthy
     restart: unless-stopped
     command: >
