@@ -1,4 +1,5 @@
 import { Camera, Image, Video, Layers, PlayCircle, Clock, CheckCircle2, AlertTriangle, FileEdit } from 'lucide-react';
+import type { DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import type { WidgetConfig, InstagramPost } from '@/types';
 import { WidgetCard } from '@/components/common/WidgetCard';
 
@@ -78,7 +79,7 @@ interface InstagramWidgetProps {
   config: WidgetConfig;
   onMinimize?: () => void;
   onClose?: () => void;
-  dragHandleProps?: Record<string, unknown> | null;
+  dragHandleProps?: DraggableProvidedDragHandleProps | null;
   isDragging?: boolean;
 }
 

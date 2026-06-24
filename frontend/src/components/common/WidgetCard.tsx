@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import { ChevronDown, ChevronUp, X, GripVertical } from 'lucide-react';
 import type { WidgetConfig } from '@/types';
 
@@ -7,7 +8,7 @@ interface WidgetCardProps {
   children: ReactNode;
   onMinimize?: () => void;
   onClose?: () => void;
-  dragHandleProps?: Record<string, unknown> | null;
+  dragHandleProps?: DraggableProvidedDragHandleProps | null;
   isDragging?: boolean;
   accentColor?: string;
   icon?: ReactNode;

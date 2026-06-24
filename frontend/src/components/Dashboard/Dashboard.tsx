@@ -3,6 +3,7 @@ import {
   Droppable,
   Draggable,
   type DropResult,
+  type DraggableProvidedDragHandleProps,
 } from '@hello-pangea/dnd';
 import { EmailWidget } from '@/components/Widgets/EmailWidget';
 import { WhatsAppWidget } from '@/components/Widgets/WhatsAppWidget';
@@ -18,7 +19,7 @@ function renderWidget(
   widget: WidgetConfig,
   onMinimize: () => void,
   onClose: () => void,
-  dragHandleProps: Record<string, unknown> | null,
+  dragHandleProps: DraggableProvidedDragHandleProps | null,
   isDragging: boolean,
 ) {
   const sharedProps = { config: widget, onMinimize, onClose, dragHandleProps, isDragging };
@@ -73,7 +74,7 @@ function DashboardColumn({ column, widgets, onMinimize, onClose, className = '' 
                     widget,
                     () => onMinimize(widget.id),
                     () => onClose(widget.id),
-                   drag.dragHandleProps as unknown as Record<string, unknown> | null,
+                   drag.dragHandleProps,
                     dragSnapshot.isDragging,
                   )}
                 </div>

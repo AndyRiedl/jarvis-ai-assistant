@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import { Newspaper, ExternalLink, TrendingUp } from 'lucide-react';
 import type { WidgetConfig, NewsArticle } from '@/types';
 import { WidgetCard } from '@/components/common/WidgetCard';
@@ -74,7 +75,7 @@ interface NewsWidgetProps {
   config: WidgetConfig;
   onMinimize?: () => void;
   onClose?: () => void;
-  dragHandleProps?: Record<string, unknown> | null;
+  dragHandleProps?: DraggableProvidedDragHandleProps | null;
   isDragging?: boolean;
 }
 

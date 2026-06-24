@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import { Mail, Paperclip, Star, AlertCircle } from 'lucide-react';
 import type { WidgetConfig, Email } from '@/types';
 import { WidgetCard } from '@/components/common/WidgetCard';
@@ -73,7 +74,7 @@ interface EmailWidgetProps {
   config: WidgetConfig;
   onMinimize?: () => void;
   onClose?: () => void;
-  dragHandleProps?: Record<string, unknown> | null;
+  dragHandleProps?: DraggableProvidedDragHandleProps | null;
   isDragging?: boolean;
 }
 

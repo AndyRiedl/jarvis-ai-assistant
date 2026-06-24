@@ -1,4 +1,5 @@
 import { MessageCircle, CheckCheck } from 'lucide-react';
+import type { DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import type { WidgetConfig, WhatsAppMessage } from '@/types';
 import { WidgetCard } from '@/components/common/WidgetCard';
 
@@ -68,7 +69,7 @@ interface WhatsAppWidgetProps {
   config: WidgetConfig;
   onMinimize?: () => void;
   onClose?: () => void;
-  dragHandleProps?: Record<string, unknown> | null;
+  dragHandleProps?: DraggableProvidedDragHandleProps | null;
   isDragging?: boolean;
 }
 
