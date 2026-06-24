@@ -13,3 +13,7 @@ imapclient==3.0.0
 aiosmtplib==3.0.0
 python-dateutil==2.8.2
 pytz==2023.3
+alembic==1.13.1
+feedparser==6.0.11
+python-jose[cryptography]==3.3.0
+cryptography==41.0.7

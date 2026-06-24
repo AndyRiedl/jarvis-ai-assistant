@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.logging_config import setup_logging
-from app.api.routes import health, chat
+from app.api.routes import health, chat, email, instagram, whatsapp, news
 
 # Setup logging
 setup_logging()
@@ -23,14 +23,23 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle management"""
-    # Startup
     logger.info("🤖 JARVIS AI Assistant starting up...")
     logger.info(f"Environment: {settings.ENVIRONMENT}")
     logger.info(f"Debug mode: {settings.DEBUG}")
-    
+
+    # Run Alembic migrations automatically on startup
+    try:
+        from alembic.config import Config
+        from alembic import command
+
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+        logger.info("✅ Database migrations applied")
+    except Exception as e:
+        logger.warning(f"⚠️  Alembic migration failed (continuing): {e}")
+
     yield
-    
-    # Shutdown
+
     logger.info("🤖 JARVIS AI Assistant shutting down...")
 
 
@@ -90,13 +99,16 @@ app.include_router(health.router, tags=["Health"])
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
 
 # Email API (Phase 1)
-# app.include_router(email.router, prefix="/api/v1/email", tags=["Email"])
+app.include_router(email.router, prefix="/api/v1/email", tags=["Email"])
 
 # Instagram API (Phase 1)
-# app.include_router(instagram.router, prefix="/api/v1/instagram", tags=["Instagram"])
+app.include_router(instagram.router, prefix="/api/v1/instagram", tags=["Instagram"])
 
 # WhatsApp API (Phase 2)
-# app.include_router(whatsapp.router, prefix="/api/v1/whatsapp", tags=["WhatsApp"])
+app.include_router(whatsapp.router, prefix="/api/v1/whatsapp", tags=["WhatsApp"])
+
+# News API
+app.include_router(news.router, prefix="/api/v1/news", tags=["News"])
 
 # LinkedIn API (Phase 2)
 # app.include_router(linkedin.router, prefix="/api/v1/linkedin", tags=["LinkedIn"])
@@ -119,7 +131,7 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "app.main:app",
         host=settings.API_HOST,
