@@ -40,14 +40,21 @@ def setup_logging():
     root_logger.addHandler(console_handler)
     
     # File handler
-    file_handler = logging.handlers.RotatingFileHandler(
-        settings.LOG_FILE,
-        maxBytes=10 * 1024 * 1024,  # 10MB
-        backupCount=5,
-    )
-    file_handler.setLevel(settings.LOG_LEVEL)
-    file_handler.setFormatter(formatter)
-    root_logger.addHandler(file_handler)
+    try:
+        file_handler = logging.handlers.RotatingFileHandler(
+            settings.LOG_FILE,
+            maxBytes=10 * 1024 * 1024,  # 10MB
+            backupCount=5,
+        )
+        file_handler.setLevel(settings.LOG_LEVEL)
+        file_handler.setFormatter(formatter)
+        root_logger.addHandler(file_handler)
+    except OSError as exc:
+        logging.getLogger(__name__).warning(
+            "Could not open log file %s (%s); logging to console only.",
+            settings.LOG_FILE,
+            exc,
+        )
     
     # Suppress noisy loggers
     logging.getLogger("urllib3").setLevel(logging.WARNING)

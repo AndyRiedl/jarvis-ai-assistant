@@ -85,12 +85,12 @@ services:
       - ENVIRONMENT=development
       - DEBUG=true
       - PYTHONUNBUFFERED=1
-      - ALLOWED_IPS=127.0.0.1,localhost,0.0.0.0
+      - ALLOWED_IPS=["127.0.0.1","localhost","0.0.0.0"]
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - ./logs:/app/logs
+      - logs_data:/app/logs
     networks:
       - jarvis-network
     depends_on:
@@ -152,4 +152,6 @@ volumes:
   redis_data:
     driver: local
   ollama_data:
+    driver: local
+  logs_data:
     driver: local

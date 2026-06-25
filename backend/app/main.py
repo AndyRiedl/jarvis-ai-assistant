@@ -3,6 +3,7 @@ JARVIS - Personal AI Assistant
 Main FastAPI Application Entry Point
 """
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -20,6 +21,15 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 
+def _run_alembic_migrations() -> None:
+    """Run Alembic migrations synchronously (must be called from a thread)."""
+    from alembic.config import Config
+    from alembic import command
+
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle management"""
@@ -27,13 +37,10 @@ async def lifespan(app: FastAPI):
     logger.info(f"Environment: {settings.ENVIRONMENT}")
     logger.info(f"Debug mode: {settings.DEBUG}")
 
-    # Run Alembic migrations automatically on startup
+    # Run Alembic migrations in a thread so asyncio.run() inside alembic/env.py
+    # doesn't conflict with the already-running FastAPI event loop.
     try:
-        from alembic.config import Config
-        from alembic import command
-
-        alembic_cfg = Config("alembic.ini")
-        command.upgrade(alembic_cfg, "head")
+        await asyncio.to_thread(_run_alembic_migrations)
         logger.info("✅ Database migrations applied")
     except Exception as e:
         logger.warning(f"⚠️  Alembic migration failed (continuing): {e}")
