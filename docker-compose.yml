@@ -85,12 +85,12 @@ services:
       - ENVIRONMENT=development
       - DEBUG=true
       - PYTHONUNBUFFERED=1
-      - ALLOWED_IPS=127.0.0.1,localhost,0.0.0.0
+      - ALLOWED_IPS=["127.0.0.1","localhost","0.0.0.0"]
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - ./logs:/app/logs
+      - logs_data:/app/logs
     networks:
       - jarvis-network
     depends_on:
@@ -101,6 +101,27 @@ services:
     restart: unless-stopped
     command: >
       sh -c 'uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload'
+
+  # ==========================================
+  # React Frontend
+  # ==========================================
+  frontend:
+    image: node:22-alpine
+    container_name: jarvis-frontend
+    working_dir: /app
+    command: sh -c 'npm install && npm run dev -- --host'
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - jarvis-network
+    depends_on:
+      - api
+    restart: unless-stopped
 
   # ==========================================
   # Nginx Reverse Proxy
@@ -131,4 +152,6 @@ volumes:
   redis_data:
     driver: local
   ollama_data:
+    driver: local
+  logs_data:
     driver: local
